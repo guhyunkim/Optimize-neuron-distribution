@@ -72,7 +72,7 @@ while True:
     if i%1000==0:
         print(i)
         save_data=pd.DataFrame(save)
-        save_data.to_csv(directory+"/save_large.txt",index=False, header=False, sep=' ')
+        save_data.to_csv(directory+"/save_erbp.txt",index=False, header=False, sep=' ')
 
     if L_d[0]==N_NC_X[0]:
          break
@@ -88,11 +88,11 @@ while True:
     i+=1
 print(1)
 save_data=pd.DataFrame(save)
-save_data.to_csv(directory+"/save_large.txt",index=False, header=False,sep=' ')
+save_data.to_csv(directory+"/save_erbp.txt",index=False, header=False,sep=' ')
 print(save)
 X_data=pd.DataFrame(X.cpu().numpy().reshape(Q,M))
-X_data.to_csv(directory+"/X_large.txt",index=False, header=False,sep=' ')    
-
+X_data.to_csv(directory+"/X_erbp.txt",index=False, header=False,sep=' ')    
+#print distributions of neurons in each layer
 print(np.sum(X.cpu().numpy()[0,0:1024,:],axis=0))
 print(np.sum(X.cpu().numpy()[0,1024:1280,:],axis=0))
 print(np.sum(X.cpu().numpy()[0,1280:1344,:],axis=0))
