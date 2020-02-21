@@ -4,8 +4,8 @@ import itertools
 import torch
 import pandas as pd
 
-# calculate the number of neuron to core connections
-def N_NC(T_input,X_input):
+# calculate the number of output neuron to core connections
+def N_ONC(T_input,X_input):
     P=((T_input.matmul(X_input))>0).float()
     return torch.sum(P,dim=(1,2))
 # constraint 1: no duplication of a nueron over multiplc cores
@@ -64,17 +64,17 @@ while True:
     alphaX.data=X.expand(n_nb,-1,-1).clone()
     alphaX[tuple(indices)]=1-alphaX[tuple(indices)]
     alphaX.data=torch.cat((X,alphaX),dim=0).cuda() # get alphaX
-    N_NC_X, cs1, cs2, cs3= N_NC(T_dup,alphaX), c1(alphaX), c2(alphaX,N), c3(alphaX,T_post,S) # calculate N_NC and constraints
-    L_d=N_NC_X+torch.sum(torch.mul(lambda1,cs1),dim=1)+torch.sum(torch.mul(lambda2,cs2),dim=1)+torch.sum(torch.mul(lambda3,cs3),dim=1)# get lagrangian
+    N_ONC_X, cs1, cs2, cs3= N_ONC(T_dup,alphaX), c1(alphaX), c2(alphaX,N), c3(alphaX,T_post,S) # calculate N_NC and constraints
+    L_d=N_ONC_X+torch.sum(torch.mul(lambda1,cs1),dim=1)+torch.sum(torch.mul(lambda2,cs2),dim=1)+torch.sum(torch.mul(lambda3,cs3),dim=1)# get lagrangian
 
-    save=np.append(save,np.array([[i,N_NC_X.cpu().numpy()[0],L_d.cpu().numpy()[0]]]),axis=0)
+    save=np.append(save,np.array([[i,N_ONC_X.cpu().numpy()[0],L_d.cpu().numpy()[0]]]),axis=0)
 
     if i%1000==0:
         print(i)
         save_data=pd.DataFrame(save)
         save_data.to_csv(directory+"/save_erbp.txt",index=False, header=False, sep=' ')
 
-    if L_d[0]==N_NC_X[0]:
+    if L_d[0]==N_ONC_X[0]:
          break
     # find the element having minimum lagrangian
     min_index=torch.argmin(L_d).item()
